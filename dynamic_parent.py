@@ -353,7 +353,6 @@ class DpClearMenu(bpy.types.Menu):
 
 class DpUI(bpy.types.Panel):
     """User interface for Dynamic Parent addon"""
-    bl_category = "Dynamic Parent"
     bl_label = "Dynamic Parent"
     bl_idname = "dp.ui"
     bl_space_type = "VIEW_3D"
