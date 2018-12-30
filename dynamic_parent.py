@@ -22,7 +22,7 @@ bl_info = {
     "name": "Dynamic Parent",
     "author": "Roman Volodin, roman.volodin@gmail.com",
     "version": (0, 51),
-    "blender": (2, 72, 0),
+    "blender": (2, 80, 0),
     "location": "View3D > Tool Panel",
     "description": "Allows to create and disable an animated ChildOf constraint",
     "warning": "The addon still in progress! Be careful!",
@@ -368,26 +368,17 @@ class DpUI(bpy.types.Panel):
         #col.operator("wm.call_menu", text="Clear", icon="RIGHTARROW_THIN").name="dp.clear_menu"
         col.menu("dp.clear_menu", text="Clear")
 
-def register():
-    bpy.utils.register_class(DpCreateConstraint)
-    bpy.utils.register_class(DpDisableConstraint)
-    bpy.utils.register_class(DpClear)
-    bpy.utils.register_class(DpBake)
-    bpy.utils.register_class(DpClearMenu)
-    bpy.utils.register_class(DpUI)
- 
-    pass 
 
-def unregister():
-    bpy.utils.unregister_class(DpCreateConstraint)
-    bpy.utils.unregister_class(DpDisableConstraint)
-    bpy.utils.unregister_class(DpClear)
-    bpy.utils.unregister_class(DpBake)
-    bpy.utils.unregister_class(DpClearMenu)
-    bpy.utils.unregister_class(DpUI)
- 
-    pass 
+classes = (
+    DpCreateConstraint,
+    DpDisableConstraint,
+    DpClear,
+    DpBake,
+    DpClearMenu,
+    DpUI,
+)
 
-if __name__ == "__main__": 
+register, unregister = bpy.utils.register_classes_factory(classes)
+
+if __name__ == "__main__":
     register()
-
