@@ -89,9 +89,9 @@ def dp_create_dynamic_parent_obj(op):
         obj.keyframe_insert(data_path='constraints["'+last_constraint.name+'"].influence')
         
         for ob in list_selected_obj:
-            ob.select = False
-        
-        obj.select = True
+            ob.select_set(False)
+
+        obj.select_set(True)
     else:
         op.report({'ERROR'}, "Two objects must be selected")
 
