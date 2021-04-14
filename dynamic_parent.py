@@ -21,7 +21,7 @@
 bl_info = {
     "name": "Dynamic Parent",
     "author": "Roman Volodin, roman.volodin@gmail.com",
-    "version": (0, 51),
+    "version": (0, 52),
     "blender": (2, 80, 0),
     "location": "View3D > Tool Panel",
     "description": "Allows to create and disable an animated ChildOf constraint",
