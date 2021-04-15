@@ -356,7 +356,8 @@ class DpUI(bpy.types.Panel):
     bl_label = "Dynamic Parent"
     bl_idname = "DP_PT_ui"
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
+    bl_category = "Dynamic Parent"
     
     def draw(self, context):
         layout = self.layout
