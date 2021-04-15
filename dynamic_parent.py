@@ -276,7 +276,7 @@ class DpCreateConstraint(bpy.types.Operator):
 
 class DYNAMIC_PARENT_OT_disable(bpy.types.Operator):
     """Disable the current animated Child Of constraint"""
-    bl_idname = "dymanic_parent.disable"
+    bl_idname = "dynamic_parent.disable"
     bl_label = "Disable Constraint"
     bl_options = {'REGISTER', 'UNDO'}
     
