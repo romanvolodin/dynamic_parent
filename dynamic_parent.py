@@ -21,13 +21,10 @@
 bl_info = {
     "name": "Dynamic Parent",
     "author": "Roman Volodin, roman.volodin@gmail.com",
-    "version": (0, 52),
-    "blender": (2, 80, 0),
+    "version": (1, 0, 0),
+    "blender": (2, 83, 0),
     "location": "View3D > Tool Panel",
     "description": "Allows to create and disable an animated ChildOf constraint",
-    "warning": "The addon still in progress! Be careful!",
-    "wiki_url": "http://wiki.blender.org/index.php/Extensions:2.6/Py/Scripts/Animation/Dynamic_Parent",
-    "tracker_url": "",
     "category": "Animation"}
 
 import bpy
