@@ -347,7 +347,7 @@ class DYNAMIC_PARENT_OT_bake(bpy.types.Operator):
 class DYNAMIC_PARENT_MT_clear_menu(bpy.types.Menu):
     """Clear or bake Dynamic Parent constraints"""
     bl_label = "Clear Dynamic Parent?"
-    bl_idname = "dynamic_parent.clear_menu"
+    bl_idname = "DYNAMIC_PARENT_MT_clear_menu"
 
     def draw(self, context):
         layout = self.layout
@@ -358,7 +358,7 @@ class DYNAMIC_PARENT_MT_clear_menu(bpy.types.Menu):
 class DYNAMIC_PARENT_PT_ui(bpy.types.Panel):
     """User interface for Dynamic Parent addon"""
     bl_label = "Dynamic Parent"
-    bl_idname = "dynamic_parent.ui"
+    bl_idname = "DYNAMIC_PARENT_PT_ui"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Dynamic Parent"
@@ -368,7 +368,7 @@ class DYNAMIC_PARENT_PT_ui(bpy.types.Panel):
         col = layout.column(align=True)
         col.operator("dynamic_parent.create", text="Create", icon="KEY_HLT")
         col.operator("dynamic_parent.disable", text="Disable", icon="KEY_DEHLT")
-        col.menu("dynamic_parent.clear_menu", text="Clear")
+        col.menu("DYNAMIC_PARENT_MT_clear_menu", text="Clear")
 
 
 classes = (
