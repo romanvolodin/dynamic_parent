@@ -25,7 +25,8 @@ bl_info = {
     "blender": (2, 83, 0),
     "location": "View3D > Tool Panel",
     "description": "Allows to create and disable an animated ChildOf constraint",
-    "category": "Animation"}
+    "category": "Animation",
+}
 
 import bpy
 import mathutils
@@ -76,7 +77,6 @@ def insert_keyframe_constraint(constraint, frame=bpy.context.scene.frame_current
     constraint.keyframe_insert(data_path='influence', frame=frame)
 
 
-# dp_keyframe_insert_*** functions  
 def dp_keyframe_insert_obj(obj):
     obj.keyframe_insert(data_path="location")
     if obj.rotation_mode == 'QUATERNION':
@@ -86,6 +86,7 @@ def dp_keyframe_insert_obj(obj):
     else:
         obj.keyframe_insert(data_path="rotation_euler")
     obj.keyframe_insert(data_path="scale")
+
 
 def dp_keyframe_insert_pbone(arm, pbone):
     arm.keyframe_insert(data_path='pose.bones["'+pbone.name+'"].location')
@@ -97,6 +98,7 @@ def dp_keyframe_insert_pbone(arm, pbone):
         arm.keyframe_insert(data_path='pose.bones["'+pbone.name+'"].rotation_euler')
     arm.keyframe_insert(data_path='pose.bones["'+pbone.name+'"].scale') 
 
+
 def dp_create_dynamic_parent_obj(op):
     obj = bpy.context.active_object
     scn = bpy.context.scene
@@ -106,7 +108,7 @@ def dp_create_dynamic_parent_obj(op):
         i = list_selected_obj.index(obj)
         list_selected_obj.pop(i)
         parent_obj = list_selected_obj[0]
-            
+
         dp_keyframe_insert_obj(obj)
         bpy.ops.object.constraint_add_with_targets(type='CHILD_OF')
         last_constraint = obj.constraints[-1]
@@ -117,20 +119,19 @@ def dp_create_dynamic_parent_obj(op):
         else:
             last_constraint.name = "DP_"+last_constraint.target.name
 
-        #bpy.ops.constraint.childof_set_inverse(constraint=""+last_constraint.name+"", owner='OBJECT')
         C = bpy.context.copy()
         C["constraint"] = last_constraint
         bpy.ops.constraint.childof_set_inverse(C, constraint=last_constraint.name, owner='OBJECT')
-        
+
         current_frame = scn.frame_current
         scn.frame_current = current_frame-1
         obj.constraints[last_constraint.name].influence = 0
         obj.keyframe_insert(data_path='constraints["'+last_constraint.name+'"].influence')
-        
+
         scn.frame_current = current_frame
         obj.constraints[last_constraint.name].influence = 1
         obj.keyframe_insert(data_path='constraints["'+last_constraint.name+'"].influence')
-        
+
         for ob in list_selected_obj:
             ob.select_set(False)
 
@@ -143,7 +144,7 @@ def dp_create_dynamic_parent_pbone(op):
     pbone = bpy.context.active_pose_bone
     scn = bpy.context.scene
     list_selected_obj = bpy.context.selected_objects
-    
+
     if len(list_selected_obj) == 2 or len(list_selected_obj) == 1:
         if len(list_selected_obj) == 2:
             i = list_selected_obj.index(arm)
@@ -156,16 +157,7 @@ def dp_create_dynamic_parent_pbone(op):
             selected_bones = bpy.context.selected_pose_bones
             selected_bones.remove(pbone)
             parent_obj_pbone = selected_bones[0]
-        
-#        debuginfo = '''
-#        DEBUG INFO:
-#        obj = {}
-#        pbone = {}
-#        parent = {}
-#        parent_bone = {}
-#        '''
-#        print(debuginfo.format(arm, pbone, parent_obj, parent_obj_pbone))
-        
+
         dp_keyframe_insert_pbone(arm, pbone)
         bpy.ops.pose.constraint_add_with_targets(type='CHILD_OF')
         last_constraint = pbone.constraints[-1]
@@ -176,7 +168,6 @@ def dp_create_dynamic_parent_pbone(op):
         else:
             last_constraint.name = "DP_"+last_constraint.target.name
 
-        #bpy.ops.constraint.childof_set_inverse(constraint=""+last_constraint.name+"", owner='BONE')
         C = bpy.context.copy()
         C["constraint"] = last_constraint
         bpy.ops.constraint.childof_set_inverse(C, constraint=last_constraint.name, owner='BONE')
@@ -219,19 +210,17 @@ def dp_clear(obj, pbone):
     for fcurve in obj.animation_data.action.fcurves:
         if "constraints" in fcurve.data_path and "DP_" in fcurve.data_path:
             dp_curves.append(fcurve)
-    
+
     for f in dp_curves:
         for key in f.keyframe_points:
             dp_keys.append(key.co[0])
-    
+
     dp_keys = list(set(dp_keys))
     dp_keys.sort()
-    
+
     for fcurve in obj.animation_data.action.fcurves[:]:
-        # Removing constraints fcurves
         if fcurve.data_path.startswith("constraints") and "DP_" in fcurve.data_path:
             obj.animation_data.action.fcurves.remove(fcurve)
-        # Removing keys for loc, rot, scale fcurves
         else:
             for frame in dp_keys:
                 for key in fcurve.keyframe_points[:]:
@@ -240,15 +229,12 @@ def dp_clear(obj, pbone):
             if not fcurve.keyframe_points:
                 obj.animation_data.action.fcurves.remove(fcurve)
 
- 
-    # Removing constraints
     if pbone:
         obj = pbone
     for const in obj.constraints[:]:
         if const.name.startswith("DP_"):
             obj.constraints.remove(const)
-        
-        
+
 
 class DpCreateConstraint(bpy.types.Operator):
     """Create a new animated Child Of constraint"""
@@ -278,12 +264,13 @@ class DpCreateConstraint(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
 class DYNAMIC_PARENT_OT_disable(bpy.types.Operator):
     """Disable the current animated Child Of constraint"""
     bl_idname = "dynamic_parent.disable"
     bl_label = "Disable Constraint"
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     @classmethod
     def poll(cls, context):
         return context.mode in ('OBJECT', 'POSE')
@@ -307,20 +294,21 @@ class DYNAMIC_PARENT_OT_disable(bpy.types.Operator):
         self.report({'INFO'}, f'{counter} constraints were disabled.')
         return {'FINISHED'}
 
+
 class DpClear(bpy.types.Operator):
     """Clear Dynamic Parent constraints"""
     bl_idname = "dp.clear"
     bl_label = "Clear Dynamic Parent"
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     def execute(self, context):
         pbone = None
         obj = bpy.context.active_object
         if obj.type == 'ARMATURE':
             pbone = bpy.context.active_pose_bone
-        
+
         dp_clear(obj, pbone)
-        
+
         return {'FINISHED'}
 
 class DpBake(bpy.types.Operator):
@@ -328,11 +316,11 @@ class DpBake(bpy.types.Operator):
     bl_idname = "dp.bake"
     bl_label = "Bake Dynamic Parent"
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     def execute(self, context):
         obj = bpy.context.active_object
         scn = bpy.context.scene
-        
+
         if obj.type == 'ARMATURE':
             obj = bpy.context.active_pose_bone
             bpy.ops.nla.bake(frame_start=scn.frame_start, 
@@ -340,7 +328,6 @@ class DpBake(bpy.types.Operator):
                              only_selected=True, visual_keying=True,
                              clear_constraints=False, clear_parents=False, 
                              bake_types={'POSE'})
-            # Removing constraints
             for const in obj.constraints[:]:
                 if const.name.startswith("DP_"):
                     obj.constraints.remove(const)
@@ -350,22 +337,23 @@ class DpBake(bpy.types.Operator):
                              only_selected=True, visual_keying=True,
                              clear_constraints=False, clear_parents=False, 
                              bake_types={'OBJECT'})
-            # Removing constraints
             for const in obj.constraints[:]:
                 if const.name.startswith("DP_"):
                     obj.constraints.remove(const)
-        
+
         return {'FINISHED'}
+
 
 class DpClearMenu(bpy.types.Menu):
     """Clear or bake Dynamic Parent constraints"""
     bl_label = "Clear Dynamic Parent?"
     bl_idname = "DP_MT_clear_menu"
-    
+
     def draw(self, context):
         layout = self.layout
         layout.operator("dp.clear", text="Clear", icon="X")
         layout.operator("dp.bake", text="Bake and clear", icon="REC")
+
 
 class DpUI(bpy.types.Panel):
     """User interface for Dynamic Parent addon"""
@@ -374,14 +362,12 @@ class DpUI(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Dynamic Parent"
-    
+
     def draw(self, context):
         layout = self.layout
         col = layout.column(align=True)
         col.operator("dp.create", text="Create", icon="KEY_HLT")
         col.operator("dynamic_parent.disable", text="Disable", icon="KEY_DEHLT")
-        #col.operator("dp.clear", text="Clear", icon="X")
-        #col.operator("wm.call_menu", text="Clear", icon="RIGHTARROW_THIN").name="dp.clear_menu"
         col.menu("DP_MT_clear_menu", text="Clear")
 
 
