@@ -62,7 +62,7 @@ def get_last_dymanic_parent_constraint(obj):
         return const
 
 
-def insert_keyframe(obj, frame=bpy.context.scene.frame_current):
+def insert_keyframe(obj, frame):
     rotation_mode = get_rotation_mode(obj)
     data_paths = (
          'location',
@@ -73,7 +73,7 @@ def insert_keyframe(obj, frame=bpy.context.scene.frame_current):
         obj.keyframe_insert(data_path=data_path, frame=frame)
 
 
-def insert_keyframe_constraint(constraint, frame=bpy.context.scene.frame_current):
+def insert_keyframe_constraint(constraint, frame):
     constraint.keyframe_insert(data_path='influence', frame=frame)
 
 
