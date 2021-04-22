@@ -13,7 +13,11 @@ The add-on requires Blender 2.83 or newer.
 
 ## Installation
 
-[Download the latest version](https://github.com/romanvolodin/dynamic_parent/releases/latest) of the add-on. You do not need to unpack the archive. Launch Blender, go to `Edit` →`Preferences...`. In the column on the left, click the `Add-ons` button. Then click the `Install...` button at the top. In the opened window, select the downloaded archive. Tick the checkbox to activate the add-on.
+- [Download the latest version](https://github.com/romanvolodin/dynamic_parent/releases/latest) of the add-on. You do not need to unpack the archive.
+- Launch Blender, go to `Edit` →`Preferences...`
+- In the column on the left, click the `Add-ons` button. Then click the `Install...` button at the top.
+- In the opened window, select the downloaded archive.
+- Tick the checkbox to activate the add-on.
 
 
 ## Usage
