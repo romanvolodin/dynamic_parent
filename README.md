@@ -11,7 +11,7 @@ The add-on requires Blender 2.83 or newer.
 
 ## Installation
 
-[Download the latest version](https://github.com/romanvolodin/dynamic_parent/releases/download/v0.52.0/dynamic_parent_v0.52.0.zip) of the add-on. You do not need to unpack the archive. Launch Blender, go to `Edit` →`Preferences...`. In the column on the left, click the `Add-ons` button. Then click the `Install...` button at the top. In the opened window, select the downloaded archive. Tick the checkbox to activate the add-on.
+[Download the latest version](https://github.com/romanvolodin/dynamic_parent/releases/latest) of the add-on. You do not need to unpack the archive. Launch Blender, go to `Edit` →`Preferences...`. In the column on the left, click the `Add-ons` button. Then click the `Install...` button at the top. In the opened window, select the downloaded archive. Tick the checkbox to activate the add-on.
 
 
 ## Usage
@@ -35,7 +35,7 @@ __Dynamic Parent__ - это аддон для Blender.
 
 ## Установка
 
-[Скачайте последнюю версию](https://github.com/romanvolodin/dynamic_parent/releases/download/v0.52.0/dynamic_parent_v0.52.0.zip) аддона. Распаковывать архив не нужно. Запустите Blender, перейдите в меню `Edit` → `Preferences...`. В столбце слева нажмите кнопку `Add-ons`. Затем вверху нажмите кнопку `Install...`. В открывшемся окне выделите скачанный архив. Включите галку, чтобы активировать аддон.
+[Скачайте последнюю версию](https://github.com/romanvolodin/dynamic_parent/releases/latest) аддона. Распаковывать архив не нужно. Запустите Blender, перейдите в меню `Edit` → `Preferences...`. В столбце слева нажмите кнопку `Add-ons`. Затем вверху нажмите кнопку `Install...`. В открывшемся окне выделите скачанный архив. Включите галку, чтобы активировать аддон.
 
 
 ## Использование
