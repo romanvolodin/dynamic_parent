@@ -236,9 +236,9 @@ def dp_clear(obj, pbone):
             obj.constraints.remove(const)
 
 
-class DpCreateConstraint(bpy.types.Operator):
+class DYNAMIC_PARENT_OT_create(bpy.types.Operator):
     """Create a new animated Child Of constraint"""
-    bl_idname = "dp.create"
+    bl_idname = "dynamic_parent.create"
     bl_label = "Create Constraint"
     bl_options = {'REGISTER', 'UNDO'}
     
@@ -295,9 +295,9 @@ class DYNAMIC_PARENT_OT_disable(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class DpClear(bpy.types.Operator):
+class DYNAMIC_PARENT_OT_clear(bpy.types.Operator):
     """Clear Dynamic Parent constraints"""
-    bl_idname = "dp.clear"
+    bl_idname = "dynamic_parent.clear"
     bl_label = "Clear Dynamic Parent"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -311,9 +311,9 @@ class DpClear(bpy.types.Operator):
 
         return {'FINISHED'}
 
-class DpBake(bpy.types.Operator):
+class DYNAMIC_PARENT_OT_bake(bpy.types.Operator):
     """Bake Dynamic Parent animation"""
-    bl_idname = "dp.bake"
+    bl_idname = "dynamic_parent.bake"
     bl_label = "Bake Dynamic Parent"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -344,21 +344,21 @@ class DpBake(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class DpClearMenu(bpy.types.Menu):
+class DYNAMIC_PARENT_MT_clear_menu(bpy.types.Menu):
     """Clear or bake Dynamic Parent constraints"""
     bl_label = "Clear Dynamic Parent?"
-    bl_idname = "DP_MT_clear_menu"
+    bl_idname = "dynamic_parent.clear_menu"
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("dp.clear", text="Clear", icon="X")
-        layout.operator("dp.bake", text="Bake and clear", icon="REC")
+        layout.operator("dynamic_parent.clear", text="Clear", icon="X")
+        layout.operator("dynamic_parent.bake", text="Bake and clear", icon="REC")
 
 
-class DpUI(bpy.types.Panel):
+class DYNAMIC_PARENT_PT_ui(bpy.types.Panel):
     """User interface for Dynamic Parent addon"""
     bl_label = "Dynamic Parent"
-    bl_idname = "DP_PT_ui"
+    bl_idname = "dynamic_parent.ui"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Dynamic Parent"
@@ -366,18 +366,18 @@ class DpUI(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         col = layout.column(align=True)
-        col.operator("dp.create", text="Create", icon="KEY_HLT")
+        col.operator("dynamic_parent.create", text="Create", icon="KEY_HLT")
         col.operator("dynamic_parent.disable", text="Disable", icon="KEY_DEHLT")
-        col.menu("DP_MT_clear_menu", text="Clear")
+        col.menu("dynamic_parent.clear_menu", text="Clear")
 
 
 classes = (
-    DpCreateConstraint,
+    DYNAMIC_PARENT_OT_create,
     DYNAMIC_PARENT_OT_disable,
-    DpClear,
-    DpBake,
-    DpClearMenu,
-    DpUI,
+    DYNAMIC_PARENT_OT_clear,
+    DYNAMIC_PARENT_OT_bake,
+    DYNAMIC_PARENT_MT_clear_menu,
+    DYNAMIC_PARENT_PT_ui,
 )
 
 register, unregister = bpy.utils.register_classes_factory(classes)
