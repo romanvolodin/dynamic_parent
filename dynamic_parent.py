@@ -241,26 +241,22 @@ class DYNAMIC_PARENT_OT_create(bpy.types.Operator):
     bl_idname = "dynamic_parent.create"
     bl_label = "Create Constraint"
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     def execute(self, context):
-        obj = bpy.context.active_object
-        
+        obj = context.active_object
+        frame = context.scene.frame_current
+
         if obj.type == 'ARMATURE':
             obj = bpy.context.active_pose_bone
-            
-            if len(obj.constraints) == 0:
-                dp_create_dynamic_parent_pbone(self)
-            else:
-                if "DP_" in obj.constraints[-1].name and obj.constraints[-1].influence == 1:
-                    dp_disable_dynamic_parent_pbone(self)
-                dp_create_dynamic_parent_pbone(self)
-        else:        
-            if len(obj.constraints) == 0:
-                dp_create_dynamic_parent_obj(self)
-            else:
-                if "DP_" in obj.constraints[-1].name and obj.constraints[-1].influence == 1:
-                    dp_disable_dynamic_parent_obj(self)
-                dp_create_dynamic_parent_obj(self)
+            const = get_last_dymanic_parent_constraint(obj)
+            if const:
+                disable_constraint(obj, const, frame)
+            dp_create_dynamic_parent_pbone(self)
+        else:
+            const = get_last_dymanic_parent_constraint(obj)
+            if const:
+                disable_constraint(obj, const, frame)
+            dp_create_dynamic_parent_obj(self)
 
         return {'FINISHED'}
 
