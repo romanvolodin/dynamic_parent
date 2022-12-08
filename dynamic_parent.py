@@ -21,7 +21,7 @@
 bl_info = {
     "name": "Dynamic Parent",
     "author": "Roman Volodin, roman.volodin@gmail.com",
-    "version": (1, 0, 0),
+    "version": (1, 0, 1),
     "blender": (2, 83, 0),
     "location": "View3D > Tool Panel",
     "description": "Allows to create and disable an animated ChildOf constraint",
@@ -247,6 +247,9 @@ class DYNAMIC_PARENT_OT_create(bpy.types.Operator):
         frame = context.scene.frame_current
 
         if obj.type == 'ARMATURE':
+            if obj.mode != 'POSE':
+                self.report({'ERROR'}, "Armature objects must be in Pose mode.")
+                return {'CANCELLED'}
             obj = bpy.context.active_pose_bone
             const = get_last_dymanic_parent_constraint(obj)
             if const:
