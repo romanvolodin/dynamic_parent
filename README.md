@@ -25,4 +25,7 @@ Select two objects, child should be selected last.
 
 Click `Create` to create constants and animation keys. Move to another frame. Click `Disable` to disable the constraints for the selected objects.
 
-The `Clear` menu will allow you to bake the animation and/or delete all created DP constraints.  
+The `Clear` menu:
+
+- `Clear` removes all created DP constraints and its keyframes. So you can start from scratch.
+- `Bake and Clear` bakes object/bone animation and then remove DP constraints.
