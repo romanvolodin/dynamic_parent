@@ -21,8 +21,8 @@
 bl_info = {
     "name": "Dynamic Parent",
     "author": "Roman Volodin, roman.volodin@gmail.com",
-    "version": (1, 0, 1),
-    "blender": (2, 83, 0),
+    "version": (2, 0, 0),
+    "blender": (4, 0, 0),
     "location": "View3D > Tool Panel",
     "description": "Allows to create and disable an animated ChildOf constraint",
     "category": "Animation",
@@ -121,7 +121,7 @@ def dp_create_dynamic_parent_obj(op):
 
         C = bpy.context.copy()
         C["constraint"] = last_constraint
-        bpy.ops.constraint.childof_set_inverse(C, constraint=last_constraint.name, owner='OBJECT')
+        bpy.ops.constraint.childof_set_inverse(constraint=last_constraint.name, owner='OBJECT')
 
         current_frame = scn.frame_current
         scn.frame_current = current_frame-1
@@ -356,7 +356,7 @@ class DYNAMIC_PARENT_MT_clear_menu(bpy.types.Menu):
 
 class DYNAMIC_PARENT_PT_ui(bpy.types.Panel):
     """User interface for Dynamic Parent addon"""
-    bl_label = "Dynamic Parent"
+    bl_label = "Dynamic Parent 2.0"
     bl_idname = "DYNAMIC_PARENT_PT_ui"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
