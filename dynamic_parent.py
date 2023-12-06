@@ -18,6 +18,9 @@
 
 # <pep8 compliant>
 
+import bpy
+
+
 bl_info = {
     "name": "Dynamic Parent",
     "author": "Roman Volodin, roman.volodin@gmail.com",
@@ -27,9 +30,6 @@ bl_info = {
     "description": "Allows to create and disable an animated ChildOf constraint",
     "category": "Animation",
 }
-
-import bpy
-import mathutils
 
 
 def get_rotation_mode(obj):
@@ -54,7 +54,7 @@ def get_selected_objects(context):
     return selected
 
 
-def get_last_dymanic_parent_constraint(obj):
+def get_last_dynamic_parent_constraint(obj):
     if not obj.constraints:
         return
     const = obj.constraints[-1]
@@ -281,12 +281,12 @@ class DYNAMIC_PARENT_OT_create(bpy.types.Operator):
                 self.report({"ERROR"}, "Armature objects must be in Pose mode.")
                 return {"CANCELLED"}
             obj = bpy.context.active_pose_bone
-            const = get_last_dymanic_parent_constraint(obj)
+            const = get_last_dynamic_parent_constraint(obj)
             if const:
                 disable_constraint(obj, const, frame)
             dp_create_dynamic_parent_pbone(self)
         else:
-            const = get_last_dymanic_parent_constraint(obj)
+            const = get_last_dynamic_parent_constraint(obj)
             if const:
                 disable_constraint(obj, const, frame)
             dp_create_dynamic_parent_obj(self)
@@ -315,7 +315,7 @@ class DYNAMIC_PARENT_OT_disable(bpy.types.Operator):
             return {"CANCELLED"}
 
         for obj in objects:
-            const = get_last_dymanic_parent_constraint(obj)
+            const = get_last_dynamic_parent_constraint(obj)
             if const is None:
                 continue
             disable_constraint(obj, const, frame)
