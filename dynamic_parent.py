@@ -24,7 +24,7 @@ import bpy
 bl_info = {
     "name": "Dynamic Parent",
     "author": "Roman Volodin, roman.volodin@gmail.com",
-    "version": (2, 0, 0),
+    "version": (2, 0, 1),
     "blender": (4, 0, 0),
     "location": "View3D > Tool Panel",
     "description": "Allows to create and disable an animated ChildOf constraint",
@@ -402,7 +402,7 @@ class DYNAMIC_PARENT_MT_clear_menu(bpy.types.Menu):
 class DYNAMIC_PARENT_PT_ui(bpy.types.Panel):
     """User interface for Dynamic Parent addon"""
 
-    bl_label = "Dynamic Parent 2.0"
+    bl_label = "Dynamic Parent 2.0.1"
     bl_idname = "DYNAMIC_PARENT_PT_ui"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
