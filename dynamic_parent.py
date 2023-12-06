@@ -186,7 +186,7 @@ def dp_create_dynamic_parent_pbone(op):
         C = bpy.context.copy()
         C["constraint"] = last_constraint
         bpy.ops.constraint.childof_set_inverse(
-            C, constraint=last_constraint.name, owner="BONE"
+            constraint=last_constraint.name, owner="BONE"
         )
 
         current_frame = scn.frame_current
