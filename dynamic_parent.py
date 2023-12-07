@@ -214,7 +214,7 @@ def dp_create_dynamic_parent_pbone(op):
 
 
 def disable_constraint(obj, const, frame):
-    if type(obj) == bpy.types.PoseBone:
+    if isinstance(obj, bpy.types.PoseBone):
         matrix_final = obj.matrix
     else:
         matrix_final = obj.matrix_world
@@ -223,7 +223,7 @@ def disable_constraint(obj, const, frame):
     insert_keyframe_constraint(const, frame=frame - 1)
 
     const.influence = 0
-    if type(obj) == bpy.types.PoseBone:
+    if isinstance(obj, bpy.types.PoseBone):
         obj.matrix = matrix_final
     else:
         obj.matrix_world = matrix_final
