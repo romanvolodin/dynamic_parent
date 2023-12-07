@@ -402,7 +402,7 @@ class DYNAMIC_PARENT_MT_clear_menu(bpy.types.Menu):
 class DYNAMIC_PARENT_PT_ui(bpy.types.Panel):
     """User interface for Dynamic Parent addon"""
 
-    bl_label = "Dynamic Parent 2.0.1"
+    bl_label = "Dynamic Parent {}.{}.{}".format(*bl_info["version"])
     bl_idname = "DYNAMIC_PARENT_PT_ui"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
