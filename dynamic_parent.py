@@ -165,6 +165,9 @@ def dp_create_dynamic_parent_pbone(op):
             parent_obj = list_selected_obj[0]
             if parent_obj.type == "ARMATURE":
                 parent_obj_pbone = parent_obj.data.bones.active
+                if not parent_obj_pbone.select:
+                    op.report({"ERROR"}, "At least two bones must be selected")
+                    return
         else:
             parent_obj = arm
             selected_bones = bpy.context.selected_pose_bones
