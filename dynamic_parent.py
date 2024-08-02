@@ -81,81 +81,6 @@ def insert_keyframe_constraint(constraint, frame):
     constraint.keyframe_insert(data_path="influence", frame=frame)
 
 
-def dp_keyframe_insert_obj(obj):
-    obj.keyframe_insert(data_path="location")
-    if obj.rotation_mode == "QUATERNION":
-        obj.keyframe_insert(data_path="rotation_quaternion")
-    elif obj.rotation_mode == "AXIS_ANGLE":
-        obj.keyframe_insert(data_path="rotation_axis_angle")
-    else:
-        obj.keyframe_insert(data_path="rotation_euler")
-    obj.keyframe_insert(data_path="scale")
-
-
-def dp_keyframe_insert_pbone(arm, pbone):
-    arm.keyframe_insert(data_path='pose.bones["' + pbone.name + '"].location')
-    if pbone.rotation_mode == "QUATERNION":
-        arm.keyframe_insert(
-            data_path='pose.bones["' + pbone.name + '"].rotation_quaternion'
-        )
-    elif pbone.rotation_mode == "AXIS_ANGLE":
-        arm.keyframe_insert(
-            data_path='pose.bones["' + pbone.name + '"].rotation_axis_angel'
-        )
-    else:
-        arm.keyframe_insert(data_path='pose.bones["' + pbone.name + '"].rotation_euler')
-    arm.keyframe_insert(data_path='pose.bones["' + pbone.name + '"].scale')
-
-
-def dp_create_dynamic_parent_obj(op):
-    obj = bpy.context.active_object
-    scn = bpy.context.scene
-    list_selected_obj = bpy.context.selected_objects
-
-    if len(list_selected_obj) == 2:
-        i = list_selected_obj.index(obj)
-        list_selected_obj.pop(i)
-        parent_obj = list_selected_obj[0]
-
-        dp_keyframe_insert_obj(obj)
-        bpy.ops.object.constraint_add_with_targets(type="CHILD_OF")
-        last_constraint = obj.constraints[-1]
-
-        if parent_obj.type == "ARMATURE":
-            last_constraint.subtarget = parent_obj.data.bones.active.name
-            last_constraint.name = (
-                "DP_" + last_constraint.target.name + "." + last_constraint.subtarget
-            )
-        else:
-            last_constraint.name = "DP_" + last_constraint.target.name
-
-        C = bpy.context.copy()
-        C["constraint"] = last_constraint
-        bpy.ops.constraint.childof_set_inverse(
-            constraint=last_constraint.name, owner="OBJECT"
-        )
-
-        current_frame = scn.frame_current
-        scn.frame_current = current_frame - 1
-        obj.constraints[last_constraint.name].influence = 0
-        obj.keyframe_insert(
-            data_path='constraints["' + last_constraint.name + '"].influence'
-        )
-
-        scn.frame_current = current_frame
-        obj.constraints[last_constraint.name].influence = 1
-        obj.keyframe_insert(
-            data_path='constraints["' + last_constraint.name + '"].influence'
-        )
-
-        for ob in list_selected_obj:
-            ob.select_set(False)
-
-        obj.select_set(True)
-    else:
-        op.report({"ERROR"}, "Two objects must be selected")
-
-
 def create_dynamic_parent(parent, children, frame):
     for obj in children:
         insert_transform_keyframe(obj, frame)
@@ -172,67 +97,6 @@ def create_dynamic_parent(parent, children, frame):
 
         constraint.influence = 1
         insert_keyframe_constraint(constraint, frame)
-
-
-def dp_create_dynamic_parent_pbone(op):
-    arm = bpy.context.active_object
-    pbone = bpy.context.active_pose_bone
-    scn = bpy.context.scene
-    list_selected_obj = bpy.context.selected_objects
-
-    if len(list_selected_obj) == 2 or len(list_selected_obj) == 1:
-        if len(list_selected_obj) == 2:
-            i = list_selected_obj.index(arm)
-            list_selected_obj.pop(i)
-            parent_obj = list_selected_obj[0]
-            if parent_obj.type == "ARMATURE":
-                parent_obj_pbone = parent_obj.data.bones.active
-        else:
-            parent_obj = arm
-            selected_bones = bpy.context.selected_pose_bones
-            selected_bones.remove(pbone)
-            parent_obj_pbone = selected_bones[0]
-
-        dp_keyframe_insert_pbone(arm, pbone)
-        bpy.ops.pose.constraint_add_with_targets(type="CHILD_OF")
-        last_constraint = pbone.constraints[-1]
-
-        if parent_obj.type == "ARMATURE":
-            last_constraint.subtarget = parent_obj_pbone.name
-            last_constraint.name = (
-                "DP_" + last_constraint.target.name + "." + last_constraint.subtarget
-            )
-        else:
-            last_constraint.name = "DP_" + last_constraint.target.name
-
-        C = bpy.context.copy()
-        C["constraint"] = last_constraint
-        bpy.ops.constraint.childof_set_inverse(
-            constraint=last_constraint.name, owner="BONE"
-        )
-
-        current_frame = scn.frame_current
-        scn.frame_current = current_frame - 1
-        pbone.constraints[last_constraint.name].influence = 0
-        arm.keyframe_insert(
-            data_path='pose.bones["'
-            + pbone.name
-            + '"].constraints["'
-            + last_constraint.name
-            + '"].influence'
-        )
-
-        scn.frame_current = current_frame
-        pbone.constraints[last_constraint.name].influence = 1
-        arm.keyframe_insert(
-            data_path='pose.bones["'
-            + pbone.name
-            + '"].constraints["'
-            + last_constraint.name
-            + '"].influence'
-        )
-    else:
-        op.report({"ERROR"}, "Two objects must be selected")
 
 
 def disable_constraint(obj, const, frame):
@@ -306,7 +170,7 @@ class DYNAMIC_PARENT_OT_create(bpy.types.Operator):
             const = get_last_dynamic_parent_constraint(parent)
             if const:
                 disable_constraint(parent, const, frame)
-            dp_create_dynamic_parent_pbone(self)
+            create_dynamic_parent(parent, children, frame)
         else:
             const = get_last_dynamic_parent_constraint(parent)
             if const:
