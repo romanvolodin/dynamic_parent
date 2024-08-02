@@ -169,6 +169,9 @@ def dp_create_dynamic_parent_pbone(op):
             parent_obj = arm
             selected_bones = bpy.context.selected_pose_bones
             selected_bones.remove(pbone)
+            if not selected_bones:
+                op.report({"ERROR"}, "At least two bones must be selected")
+                return
             parent_obj_pbone = selected_bones[0]
 
         dp_keyframe_insert_pbone(arm, pbone)
