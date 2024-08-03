@@ -51,6 +51,21 @@ def get_selected_objects(context):
     return selected
 
 
+def get_selected_parent_and_children(context):
+    if context.mode not in ("OBJECT", "POSE"):
+        return
+
+    if context.mode == "OBJECT":
+        parent = context.active_object
+        children = [obj for obj in context.selected_objects if obj != parent]
+
+    if context.mode == "POSE":
+        parent = context.active_pose_bone
+        children = [bone for bone in context.selected_pose_bones if bone != parent]
+
+    return parent, children
+
+
 def get_last_dynamic_parent_constraint(obj):
     if not obj.constraints:
         return
@@ -59,22 +74,13 @@ def get_last_dynamic_parent_constraint(obj):
         return const
 
 
-def insert_transform_keyframe(obj, frame, pbone=None):
-    pbone_prefix = ""
+def insert_transform_keyframe(obj, frame):
     rotation_mode = get_rotation_mode(obj)
 
-    if pbone is not None:
-        pbone_prefix = f"pose.bones['{pbone.name}']."
-        rotation_mode = get_rotation_mode(pbone)
-
-    data_paths = (
-        f"{pbone_prefix}location",
-        f"{pbone_prefix}rotation_{rotation_mode}",
-        f"{pbone_prefix}scale",
-    )
+    data_paths = ("location", f"rotation_{rotation_mode}", "scale")
 
     for data_path in data_paths:
-        obj.keyframe_insert(data_path=data_path, frame=frame)
+        obj.keyframe_insert(data_path, frame=frame)
 
 
 def insert_keyframe_constraint(constraint, frame):
@@ -82,9 +88,12 @@ def insert_keyframe_constraint(constraint, frame):
 
 
 def create_dynamic_parent(parent, children, frame):
-    for obj in children:
-        insert_transform_keyframe(obj, frame)
-        constraint = obj.constraints.new("CHILD_OF")
+    if isinstance(parent, bpy.types.PoseBone):
+        parent = parent.id_data
+
+    for child in children:
+        insert_transform_keyframe(child, frame)
+        constraint = child.constraints.new("CHILD_OF")
         constraint.target = parent
         constraint.name = f"DP_{parent.name}"
 
@@ -158,24 +167,17 @@ class DYNAMIC_PARENT_OT_create(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        parent = context.active_object
-        children = [child for child in context.selected_objects if child != parent]
         frame = context.scene.frame_current
+        parent, children = get_selected_parent_and_children(context)
 
-        if parent.type == "ARMATURE":
-            if parent.mode != "POSE":
-                self.report({"ERROR"}, "Armature objects must be in Pose mode.")
-                return {"CANCELLED"}
-            parent = bpy.context.active_pose_bone
-            const = get_last_dynamic_parent_constraint(parent)
-            if const:
-                disable_constraint(parent, const, frame)
-            create_dynamic_parent(parent, children, frame)
-        else:
-            const = get_last_dynamic_parent_constraint(parent)
-            if const:
-                disable_constraint(parent, const, frame)
-            create_dynamic_parent(parent, children, frame)
+        if not children:
+            self.report({"ERROR"}, "At least two objects or bones must be selected")
+            return {"CANCELLED"}
+
+        const = get_last_dynamic_parent_constraint(parent)
+        if const:
+            disable_constraint(parent, const, frame)
+        create_dynamic_parent(parent, children, frame)
 
         return {"FINISHED"}
 
