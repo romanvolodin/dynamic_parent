@@ -43,19 +43,6 @@ def get_selected_objects(context):
         return
 
     if context.mode == "OBJECT":
-        selected = [obj for obj in context.scene.objects if obj.select_get()]
-
-    if context.mode == "POSE":
-        selected = [bone for bone in context.selected_pose_bones]
-
-    return selected
-
-
-def get_selected_parent_and_children(context):
-    if context.mode not in ("OBJECT", "POSE"):
-        return
-
-    if context.mode == "OBJECT":
         parent = context.active_object
         children = [obj for obj in context.selected_objects if obj != parent]
 
@@ -63,7 +50,7 @@ def get_selected_parent_and_children(context):
         parent = context.active_pose_bone
         children = [bone for bone in context.selected_pose_bones if bone != parent]
 
-    return parent, children
+    return (parent, *children)
 
 
 def get_last_dynamic_parent_constraint(obj):
@@ -168,7 +155,13 @@ class DYNAMIC_PARENT_OT_create(bpy.types.Operator):
 
     def execute(self, context):
         frame = context.scene.frame_current
-        parent, children = get_selected_parent_and_children(context)
+        selected_objects = get_selected_objects(context)
+
+        if not selected_objects:
+            self.report({"ERROR"}, "At least two objects or bones must be selected")
+            return {"CANCELLED"}
+
+        parent, *children = selected_objects
 
         if not children:
             self.report({"ERROR"}, "At least two objects or bones must be selected")
