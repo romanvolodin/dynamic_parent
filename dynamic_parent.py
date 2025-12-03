@@ -19,13 +19,14 @@
 # <pep8 compliant>
 
 import bpy
+from bpy_extras.anim_utils import action_ensure_channelbag_for_slot
 
 
 bl_info = {
     "name": "Dynamic Parent",
-    "author": "Roman Volodin, roman.volodin@gmail.com",
-    "version": (2, 0, 2),
-    "blender": (4, 0, 0),
+    "author": "Roman Volodin (roman.volodin@gmail.com), wzrd",
+    "version": (2, 1, 0),
+    "blender": (5, 0, 0),
     "location": "View3D > Tool Panel",
     "description": "Allows to create and disable an animated ChildOf constraint",
     "category": "Animation",
@@ -165,7 +166,7 @@ def dp_create_dynamic_parent_pbone(op):
             parent_obj = list_selected_obj[0]
             if parent_obj.type == "ARMATURE":
                 parent_obj_pbone = parent_obj.data.bones.active
-                if not parent_obj_pbone.select:
+                if parent_obj_pbone is None:
                     op.report({"ERROR"}, "At least two bones must be selected")
                     return
         else:
@@ -240,9 +241,13 @@ def disable_constraint(obj, const, frame):
 
 
 def dp_clear(obj, pbone):
+    action = obj.animation_data.action
+    slot = obj.animation_data.action.slots[0]
+    channelbag = action_ensure_channelbag_for_slot(action, slot)
+
     dp_curves = []
     dp_keys = []
-    for fcurve in obj.animation_data.action.fcurves:
+    for fcurve in channelbag.fcurves:
         if "constraints" in fcurve.data_path and "DP_" in fcurve.data_path:
             dp_curves.append(fcurve)
 
@@ -253,16 +258,16 @@ def dp_clear(obj, pbone):
     dp_keys = list(set(dp_keys))
     dp_keys.sort()
 
-    for fcurve in obj.animation_data.action.fcurves[:]:
+    for fcurve in channelbag.fcurves[:]:
         if fcurve.data_path.startswith("constraints") and "DP_" in fcurve.data_path:
-            obj.animation_data.action.fcurves.remove(fcurve)
+            channelbag.fcurves.remove(fcurve)
         else:
             for frame in dp_keys:
                 for key in fcurve.keyframe_points[:]:
                     if key.co[0] == frame:
                         fcurve.keyframe_points.remove(key)
             if not fcurve.keyframe_points:
-                obj.animation_data.action.fcurves.remove(fcurve)
+                channelbag.fcurves.remove(fcurve)
 
     if pbone:
         obj = pbone
