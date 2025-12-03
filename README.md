@@ -8,7 +8,9 @@ The add-on allows you to quickly enable/disable parent-child relationships betwe
 
 ## Requirements
 
-The add-on requires Blender 2.83 or newer.
+The add-on requires Blender 5.0 or newer.
+
+For previous versions of Blender, use Dynamic Parent v2.0.2 or earlier.
 
 ## Installation
 
