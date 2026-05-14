@@ -1,0 +1,29 @@
+schema_version = "1.0.0"
+
+id = "dynamic_parent"
+version = "2.1.0"
+name = "Dynamic Parent"
+tagline = "Allows to create and disable an animated ChildOf constraint"
+maintainer = "Roman Volodin <roman.volodin@gmail.com>"
+type = "add-on"
+
+website = "https://github.com/romanvolodin/dynamic_parent"
+
+tags = ["Animation", "Rigging"]
+
+blender_version_min = "5.0.0"
+
+license = ["SPDX:GPL-3.0-or-later"]
+
+[build]
+paths_exclude_pattern = [
+    "__pycache__/",
+    "/.git/",
+    "/*.zip",
+    ".gitignore",
+    "requirements.txt",
+    "venv",
+    ".venv",
+    ".vscode",
+
+]
