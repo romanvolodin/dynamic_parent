@@ -14,6 +14,12 @@ For previous versions of Blender, use Dynamic Parent v2.0.2 or earlier.
 
 ## Installation
 
+For Blender 5.0 and newer:
+
+- Install from <https://extensions.blender.org/add-ons/dynamic-parent/>
+
+For Blender 4.x and older:
+
 - [Download the latest version](https://github.com/romanvolodin/dynamic_parent/releases/latest) of the add-on. You do not need to unpack the archive.
 - Launch Blender, go to `Edit` → `Preferences...`
 - In the column on the left, click the `Add-ons` button. Then click the `Install...` button at the top.

@@ -14,6 +14,12 @@ __Dynamic Parent__ - это аддон для Blender.
 
 ## Установка
 
+Для Blender 5.0 и новее:
+
+- Установите с <https://extensions.blender.org/add-ons/dynamic-parent/>
+
+Для Blender 4.x и более старых версий:
+
 - [Скачайте последнюю версию](https://github.com/romanvolodin/dynamic_parent/releases/latest) аддона. Распаковывать архив не нужно.
 - Запустите Blender, перейдите в меню `Edit` → `Preferences...`
 - В столбце слева нажмите кнопку `Add-ons`. Затем вверху нажмите кнопку `Install...`
