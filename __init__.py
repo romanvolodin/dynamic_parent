@@ -19,14 +19,18 @@
 # <pep8 compliant>
 
 import bpy
-from bpy_extras.anim_utils import action_ensure_channelbag_for_slot
+
+try:
+    from bpy_extras.anim_utils import action_ensure_channelbag_for_slot
+except ImportError:
+    action_ensure_channelbag_for_slot = None
 
 
 bl_info = {
     "name": "Dynamic Parent",
     "author": "Roman Volodin (roman.volodin@gmail.com), wzrd",
     "version": (2, 1, 0),
-    "blender": (5, 0, 0),
+    "blender": (4, 5, 0),
     "location": "View3D > Tool Panel",
     "description": "Allows to create and disable an animated ChildOf constraint",
     "category": "Animation",
@@ -56,7 +60,7 @@ def get_selected_objects(context):
 
 
 def get_last_dynamic_parent_constraint(obj):
-    if not obj.constraints:
+    if not obj or not obj.constraints:
         return
     const = obj.constraints[-1]
     if const.name.startswith("DP_") and const.influence == 1:
@@ -97,7 +101,7 @@ def dp_keyframe_insert_pbone(arm, pbone):
         )
     elif pbone.rotation_mode == "AXIS_ANGLE":
         arm.keyframe_insert(
-            data_path='pose.bones["' + pbone.name + '"].rotation_axis_angel'
+            data_path='pose.bones["' + pbone.name + '"].rotation_axis_angle'
         )
     else:
         arm.keyframe_insert(data_path='pose.bones["' + pbone.name + '"].rotation_euler')
@@ -126,11 +130,10 @@ def dp_create_dynamic_parent_obj(op):
         else:
             last_constraint.name = "DP_" + last_constraint.target.name
 
-        C = bpy.context.copy()
-        C["constraint"] = last_constraint
-        bpy.ops.constraint.childof_set_inverse(
-            constraint=last_constraint.name, owner="OBJECT"
-        )
+        with bpy.context.temp_override(constraint=last_constraint):
+            bpy.ops.constraint.childof_set_inverse(
+                constraint=last_constraint.name, owner="OBJECT"
+            )
 
         current_frame = scn.frame_current
         scn.frame_current = current_frame - 1
@@ -190,11 +193,10 @@ def dp_create_dynamic_parent_pbone(op):
         else:
             last_constraint.name = "DP_" + last_constraint.target.name
 
-        C = bpy.context.copy()
-        C["constraint"] = last_constraint
-        bpy.ops.constraint.childof_set_inverse(
-            constraint=last_constraint.name, owner="BONE"
-        )
+        with bpy.context.temp_override(constraint=last_constraint):
+            bpy.ops.constraint.childof_set_inverse(
+                constraint=last_constraint.name, owner="BONE"
+            )
 
         current_frame = scn.frame_current
         scn.frame_current = current_frame - 1
@@ -241,39 +243,51 @@ def disable_constraint(obj, const, frame):
 
 
 def dp_clear(obj, pbone):
-    action = obj.animation_data.action
-    slot = obj.animation_data.action.slots[0]
-    channelbag = action_ensure_channelbag_for_slot(action, slot)
+    target_obj = pbone if pbone else obj
+    
+    if obj and obj.animation_data and obj.animation_data.action:
+        action = obj.animation_data.action
+        fcurves_container = None
 
-    dp_curves = []
-    dp_keys = []
-    for fcurve in channelbag.fcurves:
-        if "constraints" in fcurve.data_path and "DP_" in fcurve.data_path:
-            dp_curves.append(fcurve)
-
-    for f in dp_curves:
-        for key in f.keyframe_points:
-            dp_keys.append(key.co[0])
-
-    dp_keys = list(set(dp_keys))
-    dp_keys.sort()
-
-    for fcurve in channelbag.fcurves[:]:
-        if fcurve.data_path.startswith("constraints") and "DP_" in fcurve.data_path:
-            channelbag.fcurves.remove(fcurve)
+        if hasattr(action, "slots") and len(action.slots) > 0 and action_ensure_channelbag_for_slot:
+            try:
+                slot = action.slots[0]
+                channelbag = action_ensure_channelbag_for_slot(action, slot)
+                fcurves_container = channelbag.fcurves
+            except Exception:
+                fcurves_container = getattr(action, "fcurves", None)
         else:
-            for frame in dp_keys:
-                for key in fcurve.keyframe_points[:]:
-                    if key.co[0] == frame:
-                        fcurve.keyframe_points.remove(key)
-            if not fcurve.keyframe_points:
-                channelbag.fcurves.remove(fcurve)
+            fcurves_container = getattr(action, "fcurves", None)
 
-    if pbone:
-        obj = pbone
-    for const in obj.constraints[:]:
-        if const.name.startswith("DP_"):
-            obj.constraints.remove(const)
+        if fcurves_container is not None:
+            dp_curves = []
+            dp_keys = []
+            for fcurve in fcurves_container:
+                if "constraints" in fcurve.data_path and "DP_" in fcurve.data_path:
+                    dp_curves.append(fcurve)
+
+            for f in dp_curves:
+                for key in f.keyframe_points:
+                    dp_keys.append(key.co[0])
+
+            dp_keys = list(set(dp_keys))
+            dp_keys.sort()
+
+            for fcurve in list(fcurves_container):
+                if fcurve.data_path.startswith("constraints") and "DP_" in fcurve.data_path:
+                    fcurves_container.remove(fcurve)
+                else:
+                    for frame in dp_keys:
+                        for key in list(fcurve.keyframe_points):
+                            if key.co[0] == frame:
+                                fcurve.keyframe_points.remove(key)
+                    if not fcurve.keyframe_points:
+                        fcurves_container.remove(fcurve)
+
+    if target_obj:
+        for const in list(target_obj.constraints):
+            if const.name.startswith("DP_"):
+                target_obj.constraints.remove(const)
 
 
 class DYNAMIC_PARENT_OT_create(bpy.types.Operator):
@@ -346,7 +360,7 @@ class DYNAMIC_PARENT_OT_clear(bpy.types.Operator):
     def execute(self, context):
         pbone = None
         obj = bpy.context.active_object
-        if obj.type == "ARMATURE":
+        if obj and obj.type == "ARMATURE":
             pbone = bpy.context.active_pose_bone
 
         dp_clear(obj, pbone)
@@ -377,7 +391,7 @@ class DYNAMIC_PARENT_OT_bake(bpy.types.Operator):
                 clear_parents=False,
                 bake_types={"POSE"},
             )
-            for const in obj.constraints[:]:
+            for const in list(obj.constraints):
                 if const.name.startswith("DP_"):
                     obj.constraints.remove(const)
         else:
@@ -391,7 +405,7 @@ class DYNAMIC_PARENT_OT_bake(bpy.types.Operator):
                 clear_parents=False,
                 bake_types={"OBJECT"},
             )
-            for const in obj.constraints[:]:
+            for const in list(obj.constraints):
                 if const.name.startswith("DP_"):
                     obj.constraints.remove(const)
 
